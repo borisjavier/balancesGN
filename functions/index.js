@@ -1,39 +1,26 @@
-const functions = require("firebase-functions");
-const firebase = require('firebase-admin');
-const express = require('express');
-const hbs = require('hbs');
-const bodyParser = require('body-parser');
-const serviceAccount = require('./assets/serviceAccountKey.json');
-const engines = require('consolidate');
-const dts = require('./balance');
+/**
+ * Import function triggers from their respective submodules:
+ *
+ * const {onCall} = require("firebase-functions/v2/https");
+ * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
+ *
+ * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ */
 
-const adminConfig = JSON.parse(process.env.FIREBASE_CONFIG);
-adminConfig.credential = firebase.credential.cert(serviceAccount);
-//adminConfig.databaseURL = "https://goldennotes-app.firebaseio.com/";
+const {onRequest} = require("firebase-functions/v2/https");
+const logger = require("firebase-functions/logger");
+const {initializeApp} = require("firebase-admin/app");
+const {getFirestore} = require("firebase-admin/firestore");
+const { buildRoutes } = require("./api/routes")
+const { buildRun } = require("./model/run")
+const { buildCache } = require("./model/build-cache")
 
-const firebaseApp = firebase.initializeApp(
-  adminConfig
-);
+initializeApp()
 
-const app = express();
-
-const instance1 = hbs.create(); //added
-app.engine('hbs', engines.handlebars);
-app.engine('html', instance1.__express);//added
-app.set('views', './views');
-app.set('view engine', 'hbs');
-app.use('/assets',express.static(__dirname +'/assets'));
-app.use('/',express.static(__dirname)); 
+const db = getFirestore();
+const cache = buildCache(db)
+const run = buildRun(cache)
+const routes = buildRoutes(run, logger)
 
 
-app.post('/app', async (req, res) => { 
-  const postBody = req.body;
- 
-    const cuenta = postBody.saldo;
-    const bal = await dts.bal(cuenta);
-    res.render('bala', { saldo: bal.bal, address: bal.address });
-})
-
-exports.app = functions
-.runWith({ memory: "1GB", timeoutSeconds: 300 })
-.https.onRequest(app); 
+exports.api = onRequest(routes);
