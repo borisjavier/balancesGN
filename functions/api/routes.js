@@ -28,6 +28,10 @@ function buildRoutes (run, logger) {
         res.json(await balanceFor(ownerAddress))
     })
 
+    app.post('/send', async (req, res) => {
+        throw new Error('not implemented yer')
+    })
+
     return app
 }
 
