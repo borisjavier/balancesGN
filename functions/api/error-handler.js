@@ -16,7 +16,9 @@ function buildErrorHandler(logger) {
         }
 
         logger.warn(`Unknown error: ${err.message}`)
-        return next()
+        res.status(500).send({
+            message: "internal server error"
+        })
     }
 
     return errorHandler
