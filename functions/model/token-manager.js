@@ -7,14 +7,13 @@ class TokenManager {
         this.run = run
     }
 
-    async balance(addressStr) {
-        const address = Address.fromString(addressStr)
-        const inventory = await this._inventoryForOwnerAddress(address)
+    async balance(addr) {
+        const inventory = await this._inventoryForOwnerAddress(addr)
 
         const tokens = inventory
             .filter(j => j.constructor.origin === GDN_TOKEN_ORIGIN)
         let balance = tokens.map(j => j.amount).reduce((a, b) => a + b, 0)
-        return { balance, address: address.toString() }
+        return { balance, address: addr.toString() }
     }
 
     async _inventoryForOwnerAddress(address) {
