@@ -1,6 +1,5 @@
 const {GnError} = require("../model/gn-error");
 
-
 function buildErrorHandler(logger) {
   function errorHandler(err, req, res, next) {
     if (err.message === "bad checksum") {
@@ -9,7 +8,7 @@ function buildErrorHandler(logger) {
       });
     }
     if (err instanceof GnError) {
-      return res.status(err.status).json( {
+      return res.status(err.status).json({
         message: err.message,
         data: err.data,
       });

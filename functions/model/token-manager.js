@@ -1,7 +1,7 @@
-const {Address, PrivateKey} = require("@runonbitcoin/nimble");
 const {GnError} = require("./gn-error");
 
-const GDN_TOKEN_ORIGIN = "a5c5b72267ea32eab1ff4c7a87da1d2c8515ddb260d88c05eb84b2c16e393e48_o1";
+const GDN_TOKEN_ORIGIN =
+  "a5c5b72267ea32eab1ff4c7a87da1d2c8515ddb260d88c05eb84b2c16e393e48_o1";
 
 class TokenManager {
   constructor(run) {
@@ -17,9 +17,12 @@ class TokenManager {
 
   async _tokensForOwnerAddress(address) {
     const utxos = await this.run.blockchain.utxos(address.toScript().toHex());
-    const maxedUtxos = utxos.slice(0, 100); // Maxed out to 100. TODO: Make this configurable
+    // Maxed out to 100. TODO: Make this configurable
+    const maxedUtxos = utxos.slice(0, 100);
     const locations = maxedUtxos.map((u) => `${u.txid}_o${u.vout}`);
-    const maybeJigs = await Promise.all(locations.map(async (loc) => this._load(loc)));
+    const maybeJigs = await Promise.all(
+        locations.map(async (loc) => this._load(loc)),
+    );
     const jigs = maybeJigs.filter((a) => a);
     return jigs
         .filter((j) => j.constructor.origin === GDN_TOKEN_ORIGIN);
@@ -52,7 +55,13 @@ class TokenManager {
     this.run.purse = pursePk.toString();
     this.run.owner = ownerPk.toString();
 
-    const newJig = await this._performSend(pursePk, ownerPk, tokensToUse, receiverAddress, amount);
+    const newJig = await this._performSend(
+        pursePk,
+        ownerPk,
+        tokensToUse,
+        receiverAddress,
+        amount,
+    );
 
     await this.run.sync();
 

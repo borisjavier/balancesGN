@@ -34,7 +34,11 @@ function buildRoutes(tokenManager, logger) {
       try {
         return PrivateKey.fromString(req.body[wifProp]);
       } catch (e) {
-        throw new GnError(`Wrong wif format for ${wifProp}`, 400, {[wifProp]: {provided: req.body[wifProp]}});
+        throw new GnError(
+            `Wrong wif format for ${wifProp}`,
+            400,
+            {[wifProp]: {provided: req.body[wifProp]}},
+        );
       }
     });
 
@@ -43,7 +47,11 @@ function buildRoutes(tokenManager, logger) {
       try {
         return Address.fromString(addrStr);
       } catch (e) {
-        throw new GnError(`Wrong address format for ${addrProp}`, 400, {[addrProp]: {provided: addrStr}});
+        throw new GnError(
+            `Wrong address format for ${addrProp}`,
+            400,
+            {[addrProp]: {provided: addrStr}},
+        );
       }
     });
 
@@ -53,7 +61,8 @@ function buildRoutes(tokenManager, logger) {
       throw new GnError(`'amount' should be a number`, 400, {amount: {original: "amount"}});
     }
 
-    const location = await tokenManager.send(ownerPk, pursePk, receiverAddress, amount);
+    const location = await tokenManager
+        .send(ownerPk, pursePk, receiverAddress, amount);
     res.json(location);
   }));
 
