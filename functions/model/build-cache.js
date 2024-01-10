@@ -1,7 +1,7 @@
-const { FirestoreCache } = require("./firestore-cache")
+const {FirestoreCache} = require("./firestore-cache");
 
-function buildCache (db) {
-    return new FirestoreCache(db)
+function buildCache(db) {
+  return new FirestoreCache(db);
 }
 
-module.exports = { buildCache }
+module.exports = {buildCache};
