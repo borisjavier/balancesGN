@@ -38,10 +38,10 @@
       "port": 9099
     },
     "functions": {
-      "port": 5001
+      "port": 5000
     },
     "firestore": {
-      "port": 8081
+      "port": 5100
     },
     "database": {
       "port": 9000
