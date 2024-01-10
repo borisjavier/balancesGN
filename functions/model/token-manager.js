@@ -1,10 +1,12 @@
 const { Address, PrivateKey } = require("@runonbitcoin/nimble")
+const { GnError } = require("./gn-error")
 
 const GDN_TOKEN_ORIGIN = 'a5c5b72267ea32eab1ff4c7a87da1d2c8515ddb260d88c05eb84b2c16e393e48_o1'
 
 class TokenManager {
     constructor (run) {
         this.run = run
+        this._previosSend = Promise.resolve()
     }
 
     async balance (addr) {
@@ -50,19 +52,32 @@ class TokenManager {
         this.run.purse = pursePk.toString()
         this.run.owner = ownerPk.toString()
 
-        let newJig
-        this.run.transaction(() => {
-            const jig = tokensToUse[0]
-            if (tokensToUse.length > 1) {
-                jig.combine(tokensToUse.slice(1))
-            }
-            newJig = jig.send(receiverAddress.toString(), amount)
-        })
+        const newJig = await this._performSend(pursePk, ownerPk, tokensToUse, receiverAddress, amount)
 
         await this.run.sync()
 
         const [txid, vout] = newJig.location.split('_o')
         return { txid, vout }
+    }
+
+    async _performSend(pursePk, ownerPk, tokensToUse, receiverAddress, amount) {
+        const newSend = this._previosSend.then(() => {
+            this.run.purse = pursePk.toString()
+            this.run.owner = ownerPk.toString()
+
+            const newJig = this.run.transaction(() => {
+                console.log(tokensToUse.map(t => t.constructor.origin))
+                const jig = tokensToUse[0]
+                if (tokensToUse.length > 1) {
+                    jig.combine(...tokensToUse.slice(1))
+                }
+                return jig.send(receiverAddress.toString(), amount)
+            })
+            console.log(newJig)
+            return this.run.sync().then(() => newJig)
+        })
+        this._previosSend = newSend
+        return newSend
     }
 
     async _load (location) {
