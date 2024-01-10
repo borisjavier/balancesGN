@@ -6,9 +6,21 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
-  "functions": {
-    "source": "functions"
-  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint"
+      ]
+    }
+  ],
   "hosting": {
     "public": "public",
     "rewrites": [
@@ -26,10 +38,10 @@
       "port": 9099
     },
     "functions": {
-      "port": 5001
+      "port": 5000
     },
     "firestore": {
-      "port": 8080
+      "port": 5100
     },
     "database": {
       "port": 9000
@@ -45,4 +57,3 @@
     "template": "remoteconfig.template.json"
   }
 }
-
