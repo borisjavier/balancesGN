@@ -22,11 +22,6 @@ function buildRoutes (run, logger) {
         return { balance, address: address.toString() }
     }
 
-    app.get('/utxos', async (req, res) => {
-        console.log(run.blockchain)
-        res.send('ok')
-    })
-
     app.post('/balance', async (req, res) => {
         const body = req.body
         const ownerAddress = body.ownerAddress
